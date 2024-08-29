@@ -22,11 +22,71 @@ code {
 <p> <a href="https://cmake.org/download/">Cmake download</a> </p>
 
 <p>
-<code>
+<pre><code>
 sudo apt-get update
 sudo apt-get install build-essential
-</code>
+</code></pre>
 </p>
+
+<p>
+<pre><code>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <time.h>
+#include <sys/utsname.h>
+#include <ctype.h>
+ 
+int main(int argc, char *argv[]) {
+    // Store the current error message
+    char error_message[256];
+ 
+    // Get the current Linux user name using getlogin() 
+    char* linux_username = getlogin();
+    // Simple error checking and exit if failed.
+    if (linux_username == NULL) {
+        snprintf(error_message, sizeof(error_message), "%s: Error getting Linux Username.", argv[0]);
+        perror(error_message);
+        return 1;
+    }
+ 
+    // Convert first letter of Linux username to the Uppercase.
+    // If username is is 'foo', then, it should be 'Foo'
+    if (linux_username[0] != '\0') {
+        linux_username[0] = toupper(linux_username[0]);
+    }
+ 
+    // Get the current Linux Hostname using the uname()
+    struct utsname linux_host;
+    if (uname(&linux_host) != 0) {
+        snprintf(error_message, sizeof(error_message), "%s: Error getting Linux hostname.", argv[0]);    
+        perror(error_message);
+        return 1;
+    }
+ // Get the current date and time
+    time_t linux_rawtime;
+    struct tm* linux_timeinfo;
+    time(&linux_rawtime);
+    linux_timeinfo = localtime(&linux_rawtime);
+    if (linux_timeinfo == NULL) {
+        snprintf(error_message, sizeof(error_message), "%s: Error getting Linux date or time.", argv[0]);    
+        perror(error_message);    
+        return 1;
+    }
+ 
+    // Format the date and time
+    char now_str[80];
+    strftime(now_str, sizeof(now_str), "%Y-%m-%d %H:%M:%S", linux_timeinfo);
+ 
+    // Print the username, hostname, date, and time
+    printf("Hello, %s! Let's be friends!!\n", linux_username);
+    printf("The current date and time is '%s' on the '%s' Linux system.\nBye!\n", now_str, linux_host.nodename);
+ 
+    return 0;
+}
+</code></pre>
+</p>
+
 
 </body>
 </html>
